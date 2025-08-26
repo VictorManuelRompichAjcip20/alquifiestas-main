@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Kristin - Login</title>
+    <link rel="icon" type="image/svg+xml" href="static/logo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f5f5, #e6e6e6);
+            padding: 2rem;
+            perspective: 800px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform-style: preserve-3d;
+            animation: containerAppear 1s ease forwards;
+        }
+
+        @keyframes containerAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px) rotateX(5deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .image-side {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transform: translateZ(0);
+        }
+
+        .image-side::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0,0,0,0.2), transparent);
+            z-index: 1;
+        }
+
+        .image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1);
+            animation: imageZoom 20s infinite alternate;
+        }
+
+        .login-side {
+            flex: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+            position: relative;
+        }
+
+        .login-header {
+            text-align: center;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .login-header h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            color: #333;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+            position: relative;
+            animation: fadeInUp 0.8s ease both;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+
+        .input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: #9a8478;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 2.8rem;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #9a8478;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(154,132,120,0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            color: #9a8478;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .password-toggle:hover {
+            color: #86726a;
+        }
+
+        .login-button {
+            background: #9a8478;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 150px;
+        }
+
+        .login-button:hover {
+            background: #86726a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(154,132,120,0.3);
+        }
+
+        .loading-spinner {
+            display: none;
+            font-size: 1rem;
+        }
+
+        .login-button.loading .loading-spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        .login-button.loading .button-text {
+            opacity: 0;
+        }
+
+        .forgot-password {
+            margin-top: 2rem;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .forgot-password a {
+            color: #9a8478;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #86726a;
+            text-decoration: underline;
+        }
+
+        .success-message, .error-message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: fadeInUp 0.5s ease;
+            text-align: center;
+        }
+
+        .success-message i, .error-message i {
+            margin-right: 0.5rem;
+        }
+
+        .success-message {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+        }
+
+        .error-message {
+            background: rgba(245, 101, 101, 0.1);
+            color: #c53030;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+
+            .image-side {
+                height: 200px;
+            }
+
+            .login-side {
+                padding: 2rem;
+            }
+
+            .login-header {
+                margin-bottom: 2rem;
+            }
+
+            .login-header h1 {
+                font-size: 2.5rem;
+            }
+        }
+        .fade-effect {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(to top, 
+                rgba(255,255,255,0.9), 
+                rgba(255,255,255,0.5) 50%,
+                transparent);
+            pointer-events: none;
+        }
+
+        .login-header h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ffa726, #fb8c00); /* Color dorado */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .login-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(to right, 
+                transparent,
+                #9e9e9e, /* Color plateado */
+                #9e9e9e,
+                transparent
+            );
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            font-weight: 300;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* Actualizar colores de los botones e interacciones */
+        .login-button {
+            background: linear-gradient(to right, #ffa726, #fb8c00);
+            box-shadow: 0 4px 15px rgba(255, 167, 38, 0.2);
+        }
+
+        .login-button:hover {
+            background: linear-gradient(to right, #fb8c00, #f57c00);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 167, 38, 0.3);
+        }
+
+        .form-group input:focus {
+            border-color: #ffa726;
+            box-shadow: 0 0 0 3px rgba(255, 167, 38, 0.1);
+        }
+
+        .input-icon {
+            color: #5a3709;
+        }
+
+        .password-toggle {
+            color: #5a3709;
+        }
+
+        .password-toggle:hover {
+            color: #5a3709;
+        }
+
+        .forgot-password a {
+            color: #5a3709;
+        }
+
+        .forgot-password a:hover {
+            color: #5a3709;
+        }
+
+        /* Añadir efecto de brillo */
+        @keyframes shine {
+            0% {
+                background-position: -100% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .login-header h1 {
+            background: linear-gradient(
+                to right,
+                #ffa726 20%,
+                #ffcc80 30%,
+                #ffd8a8 40%,
+                #ffcc80 50%,
+                #ffa726 60%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 3s linear infinite;
+            color: transparent;
+        }
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding-right: 40px; /* Espacio para el swoosh */
+        }
+
+        .salon-text {
+            color: #9e9e9e;
+            font-size: 1rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            font-family: 'Arial', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-side">
+            <img src="static/woman.jpg" alt="Beauty Salon">
+            <div class="fade-effect"></div>
+        </div>
+        <div class="login-side">
+            <div class="login-header">
+                <div class="logo-container">
+                    <img src="static/alquifiestas.png" alt="Logo de Calzada class="logo-img">
+                </div>
+            </div>
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i>Inicio de sesión exitoso
+            </div>
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>Usuario o contraseña incorrectos
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <div class="input-container">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" placeholder="Ingrese su nombre de usuario" id="username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-container">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" placeholder="Ingrese su contraseña" id="password"  required>
+                        <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+                    </div>
+                </div>
+                <button type="submit" class="login-button">
+                    <span class="button-text">Iniciar Sesión</span>
+                    <i class="fas fa-spinner loading-spinner"></i>
+                </button>
+            </form>
+            <div class="forgot-password">
+                <span>¿No tienes una cuenta?</span>
+                <a href="/register_page">Registrate</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('loginForm');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.querySelector('.login-button');
+    const successMessage = document.querySelector('.success-message');
+    const errorMessage = document.querySelector('.error-message');
+
+    passwordToggle.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
+
+        const buttonText = loginButton.querySelector('.button-text');
+        loginButton.classList.add('loading');
+        buttonText.textContent = 'Iniciando sesión...';
+        loginButton.disabled = true;
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                successMessage.style.display = 'block';
+                successMessage.textContent = data.message;
+                form.reset();
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1000);
+            } else {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = data.message;
+            }
+        } catch (error) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Error al conectar con el servidor';
+        } finally {
+            loginButton.classList.remove('loading');
+            buttonText.textContent = 'Iniciar Sesión';
+            loginButton.disabled = false;
+        }
+    });
+
+    const inputs = document.querySelectorAll('.form-group input');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+        });
+    });
+});
+    </script>
+</body>
+</html>

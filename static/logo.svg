@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#fff5eb"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#FF8C00" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <style>
+    .letter-d {
+      font-family: "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 900;
+      stroke: #FF8C00;
+      stroke-width: 1px;
+      filter: url(#shadow);
+    }
+  </style>
+  <!-- Fondo cuadrado con gradiente -->
+  <rect width="40" height="40" fill="url(#bgGradient)" rx="8"/>
+  <!-- Borde decorativo -->
+  <rect x="2" y="2" width="36" height="36" rx="6" 
+        fill="none" stroke="#FF8C00" stroke-width="0.5" 
+        stroke-opacity="0.3"/>
+  <!-- D con efecto de remarcado -->
+  <text x="8" y="30" class="letter-d" font-size="35" fill="#FF8C00">D</text>
+  <text x="28" y="20" class="apostrophe" font-size="20" fill="#FF8C00">'</text>
+</svg>
