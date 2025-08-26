@@ -5,7 +5,7 @@ import os
 
 # Inicialización de Flask
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'tu-clave-secreta-muy-segura')
+app.secret_key = os.environ.get('SECRET_KEY', '1234')
 
 # Configuración de la base de datos
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -241,3 +241,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5050))
     print("Iniciando aplicación Flask con SQLAlchemy...")
     app.run(host='0.0.0.0', port=port, debug=False)
+
