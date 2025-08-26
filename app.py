@@ -10,13 +10,15 @@ app.secret_key = os.environ.get('SECRET_KEY', '1234')
 # Configuración de la base de datos
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
+# Si usas psycopg3, cambia postgresql:// por postgresql+psycopg://
 if DATABASE_URL:
-    # Producción - Render proporciona DATABASE_URL automáticamente
+    # Para psycopg3, usa el esquema correcto
+    if DATABASE_URL.startswith('postgresql://'):
+        DATABASE_URL = DATABASE_URL.replace('postgresql://', 'postgresql+psycopg://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 else:
-    # Desarrollo - conectar directo a tu base en Render
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://alquifiestas_user:OGKpbEmUIefuJ2R8YRJ8AUo7ZmlfNFW1@dpg-d2me99ogjchc73ci0mf0-a.oregon-postgres.render.com:5432/alquifiestas'
-
+    # Para desarrollo
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg://alquifiestas_user:OGKpbEmUIefuJ2R8YRJ8AUo7ZmlfNFW1@dpg-d2me99ogjchc73ci0mf0-a.oregon-postgres.render.com:5432/alquifiestas'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -241,4 +243,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5050))
     print("Iniciando aplicación Flask con SQLAlchemy...")
     app.run(host='0.0.0.0', port=port, debug=False)
+
 
