@@ -441,7 +441,7 @@
                     password: password,
                     full_name: `${document.getElementById('nombre').value} ${document.getElementById('apellido').value}`.trim(), // COMBINADO
                     telefono: document.getElementById('telefono').value || '', // OPCIONAL
-                    direccion: document.getElementById('direccion').value || '' // CAPTURADO DEL FORMULARIO
+                    direccion: '' // Campo por defecto
                 };
 
                 try {
