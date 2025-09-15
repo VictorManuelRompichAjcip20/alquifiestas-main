@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D'Kristin - Registro</title>
-    <link rel="icon" type="image/svg+xml" href="static/logo.svg">
+    <title>La Calzada - Registro</title>
+    <link rel="icon" type="image/svg+xml" href="static/logo-calzada.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500&display=swap');
@@ -27,7 +27,7 @@
 
         .container {
             display: flex;
-            max-width: 1400px; /* Aumentado de 1200px */
+            max-width: 1400px;
             width: 100%;
             background: white;
             border-radius: 20px;
@@ -55,9 +55,9 @@
             right: 0;
             height: 150px;
             background: linear-gradient(to top, 
-                rgba(255,255,255,0.9),  /* Casi completamente blanco abajo */
-                rgba(255,255,255,0.5) 50%,  /* Semi-transparente a la mitad */
-                transparent);  /* Completamente transparente arriba */
+                rgba(255,255,255,0.9),
+                rgba(255,255,255,0.5) 50%,
+                transparent);
             pointer-events: none;
         }
 
@@ -92,7 +92,7 @@
 
         .register-side {
             flex: 1;
-            padding: 2rem 3rem; /* Aumentado el padding horizontal */
+            padding: 2rem 3rem;
             display: flex;
             flex-direction: column;
             background: white;
@@ -113,46 +113,9 @@
             margin-bottom: 1rem;
         }
 
-        .logo-text {
-            font-size: 3.5rem;
-            font-family: 'Times New Roman', serif;
-            letter-spacing: 1px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .logo-text .d {
-            color: #ffa726;
-            font-style: italic;
-            font-size: 4rem;
-            margin-right: -10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo-text .apostrophe {
-            color: #ffa726;
-            font-style: italic;
-            font-size: 3rem;
-            position: relative;
-            top: -10px;
-        }
-
-        .logo-text .kristin {
-            background: linear-gradient(to right, #ffa726 30%, #ffb74d 50%, #ffa726 70%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 500;
-            letter-spacing: 2px;
-        }
-
-        .salon-text {
-            color: #9e9e9e;
-            font-size: 1rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            margin-top: 20px;
-            font-family: 'Arial', sans-serif;
+        .logo-img {
+            max-width: 140px;
+            height: auto;
         }
 
         .form-container {
@@ -166,6 +129,10 @@
             margin-bottom: 0rem;
             position: relative;
             animation: fadeInUp 0.8s ease both;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-group label {
@@ -272,72 +239,75 @@
             .register-side {
                 padding: 2rem;
             }
+
+            .form-container {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* Estilo para el contenedor del botón */
-.register-button-container {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1rem;
-}
+        .register-button-container {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+        }
 
-/* Estilos para el spinner de carga */
-.loading-spinner {
-    display: none;
-    animation: spin 1s linear infinite;
-}
+        .loading-spinner {
+            display: none;
+            animation: spin 1s linear infinite;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* Cuando el botón está en estado de carga */
-.register-button.loading {
-    position: relative;
-    pointer-events: none;
-}
+        .register-button.loading {
+            position: relative;
+            pointer-events: none;
+        }
 
-.register-button.loading .button-text {
-    visibility: hidden;
-}
+        .register-button.loading .button-text {
+            visibility: hidden;
+        }
 
-.register-button.loading .loading-spinner {
-    display: inline-block;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.logo-underline {
+        .register-button.loading .loading-spinner {
+            display: inline-block;
             position: absolute;
-            bottom: -10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(
-                to right,
-                transparent,
-                #9e9e9e 20%,
-                #9e9e9e 80%,
-                transparent
-            );
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="image-side">
-            <img src="static/wicho.jpg" alt="Beauty Salon">
+            <img src="static/registro.jpg" alt="Beauty Salon">
             <div class="fade-effect"></div>
         </div>
         <div class="register-side">
             <div class="login-header">
                 <div class="logo-container">
-                    <img src="static/alquifiestas.png" alt="Logo de Calzada class="logo-img">
+                    <img src="static/alquifiestas.png" alt="Logo Alquifiestas" class="logo-img">
                 </div>
             </div>
             <form id="registerForm">
@@ -356,13 +326,16 @@
                             <input type="text" id="apellido" placeholder="Ingrese su apellido" required>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                    
+                    <!-- CAMPO EMAIL AGREGADO -->
+                    <div class="form-group full-width">
+                        <label for="email">Correo Electrónico</label>
                         <div class="input-container">
-                            <i class="fas fa-calendar input-icon"></i>
-                            <input type="date" id="fecha_nacimiento" required>
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="email" placeholder="Ingrese su correo electrónico" required>
                         </div>
                     </div>
+                    
                     <div class="form-group">
                         <label for="username">Nombre de Usuario</label>
                         <div class="input-container">
@@ -370,6 +343,14 @@
                             <input type="text" id="username" placeholder="Ingrese su nombre de usuario" required>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono (Opcional)</label>
+                        <div class="input-container">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="tel" id="telefono" placeholder="Ingrese su teléfono">
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="password">Contraseña</label>
                         <div class="input-container">
@@ -382,10 +363,11 @@
                         <label for="confirm_password">Confirmar Contraseña</label>
                         <div class="input-container">
                             <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="confirm_password"  placeholder="Confirme su contraseña" required>
+                            <input type="password" id="confirm_password" placeholder="Confirme su contraseña" required>
                             <i class="fas fa-eye password-toggle" id="confirmPasswordToggle"></i>
                         </div>
                     </div>
+                    
                     <div class="register-button-container">
                         <button type="submit" class="register-button">
                             <span class="button-text">Registrarse</span>
@@ -393,6 +375,7 @@
                         </button>
                     </div>
                 </div>
+                <div class="error-message" id="errorMessage"></div>
             </form>
             <div class="login-link">
                 <span>¿Ya tienes una cuenta?</span>
@@ -408,6 +391,15 @@
             const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirm_password');
+            const errorMessage = document.getElementById('errorMessage');
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
 
             // Toggle password visibility
             function togglePasswordVisibility(input, toggle) {
@@ -429,18 +421,27 @@
                 const password = passwordInput.value;
                 const confirmPassword = confirmPasswordInput.value;
 
+                // Validaciones
                 if (password !== confirmPassword) {
-                    alert('Las contraseñas no coinciden');
+                    showError('Las contraseñas no coinciden');
                     button.classList.remove('loading');
                     return;
                 }
 
+                if (password.length < 6) {
+                    showError('La contraseña debe tener al menos 6 caracteres');
+                    button.classList.remove('loading');
+                    return;
+                }
+
+                // Preparar datos - CORREGIDO para que coincida con el backend
                 const formData = {
-                    nombre: document.getElementById('nombre').value,
-                    apellido: document.getElementById('apellido').value,
-                    fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
                     username: document.getElementById('username').value,
+                    email: document.getElementById('email').value, // CAMPO AGREGADO
                     password: password,
+                    full_name: `${document.getElementById('nombre').value} ${document.getElementById('apellido').value}`.trim(), // COMBINADO
+                    telefono: document.getElementById('telefono').value || '', // OPCIONAL
+                    direccion: document.getElementById('direccion').value || '' // CAPTURADO DEL FORMULARIO
                 };
 
                 try {
@@ -455,13 +456,16 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        alert('Registro exitoso');
+                        // Éxito
+                        showError(''); // Limpiar errores
+                        alert('Registro exitoso. Bienvenido!');
                         window.location.href = '/';
                     } else {
-                        alert(data.message || 'Error en el registro');
+                        showError(data.message || 'Error en el registro');
                     }
                 } catch (error) {
-                    alert('Error al conectar con el servidor');
+                    console.error('Error:', error);
+                    showError('Error al conectar con el servidor');
                 } finally {
                     button.classList.remove('loading');
                 }
