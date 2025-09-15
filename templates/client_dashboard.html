@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Calzada - Portal Cliente</title>
+    <link rel="icon" type="image/svg+xml" href="static/logo-calzada.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #60A5FA;
+            --primary-dark: #1D4ED8;
+            --accent-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --background: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E7EB;
+            --sidebar-bg: #FFFFFF;
+            --hover-bg: #F1F5F9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--sidebar-bg);
+            padding: 2rem;
+            box-shadow: 2px 0 25px rgba(0,0,0,0.08);
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .logo-img {
+            max-width: 140px;
+            height: auto;
+            filter: drop-shadow(0 2px 8px rgba(37, 99, 235, 0.15));
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            padding: 1.5rem;
+            border-radius: 16px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+
+        .user-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-info p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-section {
+            margin-top: 2rem;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        .menu-link:hover {
+            background: var(--hover-bg);
+            transform: translateX(8px);
+            color: var(--primary-color);
+        }
+
+        .menu-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            transform: translateX(8px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .menu-link i {
+            width: 24px;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2.5rem;
+            overflow-y: auto;
+            background: var(--background);
+        }
+
+        .header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            border-radius: 2px;
+        }
+
+        .btn-agendar {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .btn-agendar:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .eventos-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .evento-item {
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .evento-item:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+        }
+
+        .evento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .evento-header strong {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-reservado {
+            background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+            color: #92400E;
+        }
+
+        .status-confirmado {
+            background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+            color: #065F46;
+        }
+
+        .status-completado {
+            background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+            color: #1E40AF;
+        }
+
+        .status-cancelado {
+            background: linear-gradient(135deg, #FEE2E2, #FECACA);
+            color: #991B1B;
+        }
+
+        .evento-details {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .evento-details p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .evento-details i {
+            color: var(--primary-color);
+            width: 16px;
+        }
+
+        .evento-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-color), #34D399);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover, .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .servicios-preview {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .servicio-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(37, 99, 235, 0.06);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .servicio-preview:hover {
+            background: rgba(37, 99, 235, 0.1);
+            transform: translateX(4px);
+        }
+
+        .servicio-preview .nombre {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .servicio-preview .precio {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--card-bg), #F8FAFC);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+            background: var(--hover-bg);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .servicios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .servicio-card {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            position: relative;
+        }
+
+        .servicio-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);
+        }
+
+        .servicio-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.06);
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .servicio-nombre {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .servicio-precio {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .servicio-duracion {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .cantidad-selector {
+            background: rgba(37, 99, 235, 0.08);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            margin-top: 1rem;
+        }
+
+        .btn-cantidad {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cantidad:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: scale(1.05);
+        }
+
+        .input-cantidad {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .input-cantidad:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .stock-info {
+            margin-top: 0.5rem;
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, var(--card-bg), #F8FAFC);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+            text-align: center;
+            border: 2px solid var(--primary-light);
+        }
+
+        .total-section label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-footer {
+            padding: 2rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            border-radius: 0 0 20px 20px;
+            background: #fafbfc;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+            transform: translateY(-1px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .servicios-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .total-amount {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="static/alquifiestas.png" alt="Logo Alquifiestas" class="logo-img">
+            </div>
+
+            <div class="user-info">
+                <h3 id="cliente-nombre">Cargando...</h3>
+                <p>Cliente</p>
+            </div>
+
+            <nav class="menu-section">
+                <a href="#" class="menu-link active" data-section="inicio">
+                    <i class="fas fa-home"></i>
+                    Inicio
+                </a>
+                <a href="#" class="menu-link" data-section="eventos">
+                    <i class="fas fa-calendar-plus"></i>
+                    Agendar Evento
+                </a>
+                <a href="#" class="menu-link" data-section="mis-eventos">
+                    <i class="fas fa-calendar-check"></i>
+                    Mis Eventos
+                </a>
+                <a href="#" class="menu-link" data-section="perfil">
+                    <i class="fas fa-user"></i>
+                    Mi Perfil
+                </a>
+                <a href="/logout" class="menu-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </a>
+            </nav>
+
+            <div class="social-links" style="margin-top: 2rem; text-align: center;">
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                    ¿Tienes dudas? Escríbenos:
+                </p>
+                <a href="https://www.facebook.com/alquifiestascalzada?locale=es_LA" target="_blank" style="margin: 0 0.5rem; font-size: 1.5rem; color: #1877F2;">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://wa.me/50245116543" target="_blank" style="margin: 0 0.5rem; font-size: 1.5rem; color: #25D366;">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sección Inicio -->
+            <div id="seccion-inicio" class="section active">
+                <div class="header">
+                    <h1>Bienvenido a Alquifiestas la calzada!</h1>
+                    <button class="btn-agendar" onclick="mostrarFormularioEvento()">
+                        <i class="fas fa-plus"></i>
+                        Agendar Nuevo Evento
+                    </button>
+                </div>
+
+                <div class="carousel-container" style="margin-bottom:2rem; position:relative; max-width:100%; overflow:hidden; border-radius:16px;">
+                    <div class="carousel-slides" style="display:flex; transition: transform 0.5s ease-in-out;">
+                        <img src="static/carrusel1.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <img src="static/carrusel2.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <img src="static/carrusel3.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <img src="static/carrusel4.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <img src="static/carrusel5.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <img src="static/carrusel6.jpg" style="width:100%; height:325px; object-fit:cover;">
+                        <!-- Clon del primero -->
+                        <img src="static/carrusel1.jpg" style="width:100%; height:325px; object-fit:cover;">
+                    </div>
+                </div>
+
+                <script>
+                    const slides = document.querySelector(".carousel-slides");
+                    const total = slides.children.length;
+                    let index = 0;
+
+                    setInterval(() => {
+                        index++;
+                        slides.style.transition = "transform 0.5s ease-in-out";
+                        slides.style.transform = `translateX(-${index * 100}%)`;
+
+                        // cuando llegue al clon, esperar la animación y resetear
+                        if (index === total - 1) {
+                            setTimeout(() => {
+                                slides.style.transform = "translateX(0)"; // volver al inicio
+                                index = 0;
+                            }, 500); // el mismo tiempo que dura la transición
+                        }
+                    }, 2000);
+                </script>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-calendar-check"></i> Próximos Eventos</h3>
+                        <div id="proximos-eventos">
+                            <p class="text-muted">Cargando eventos...</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-star"></i> Servicios Disponibles</h3>
+                        <div id="servicios-disponibles">
+                            <p class="text-muted">Cargando servicios...</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-box"></i> Artículos Disponibles</h3>
+                        <div id="articulos-disponibles">
+                            <p class="text-muted">Cargando artículos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Agendar Evento -->
+            <div id="seccion-eventos" class="section">
+                <div class="header">
+                    <h1>Agendar Evento</h1>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-calendar-plus"></i> Crear Nuevo Evento</h3>
+                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">
+                        Selecciona la fecha, hora y servicios para tu evento especial.
+                    </p>
+                    <button class="btn-agendar" onclick="mostrarFormularioEvento()">
+                        <i class="fas fa-plus"></i>
+                        Nuevo Evento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sección Mis Eventos -->
+            <div id="seccion-mis-eventos" class="section">
+                <div class="header">
+                    <h1>Mis Eventos</h1>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-calendar-check"></i> Lista de Eventos</h3>
+                    <div class="eventos-list" id="lista-eventos">
+                        <p class="text-muted">Cargando eventos...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Perfil -->
+            <div id="seccion-perfil" class="section">
+                <div class="header">
+                    <h1>Mi Perfil</h1>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-user-circle"></i> Información Personal</h3>
+                    <div id="info-perfil">
+                        <p class="text-muted">Cargando información del perfil...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Agendar Evento -->
+    <div id="modal-evento" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Agendar Nuevo Evento</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-evento">
+                    <div class="form-group">
+                        <label for="fecha_evento">Fecha del Evento</label>
+                        <input type="date" class="form-control" id="fecha_evento" name="fecha_evento" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="hora_inicio">Hora de Inicio</label>
+                            <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hora_fin">Hora de Fin</label>
+                            <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Servicios y Artículos Disponibles</label>
+                        <div class="servicios-grid" id="servicios-grid">
+                            <!-- Los servicios se cargarán dinámicamente -->
+                        </div>
+                    </div>
+
+                    <div class="total-section">
+                        <label>Total del Evento</label>
+                        <div class="total-amount" id="total-evento">Q0.00</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarEvento()">
+                    <i class="fas fa-check"></i>
+                    Agendar Evento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let serviciosSeleccionados = [];
+        let serviciosDisponibles = [];
+        let articulosDisponibles = [];
+
+        // Cargar datos iniciales
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarDatosCliente();
+            cargarServicios();
+            cargarArticulos();
+            cargarEventos();
+            
+            // Eliminado: autoPlayCarousel() - función no definida
+
+            // Configurar navegación
+            document.querySelectorAll('.menu-link[data-section]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+                    
+                    // Actualizar clase activa en menú
+                    document.querySelector('.menu-link.active').classList.remove('active');
+                    this.classList.add('active');
+                    
+                    // Mostrar sección correspondiente
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(`seccion-${section}`).classList.add('active');
+                    
+                    // Cargar datos específicos de la sección
+                    if (section === 'mis-eventos') {
+                        cargarEventos();
+                    } else if (section === 'perfil') {
+                        mostrarPerfil();
+                    }
+                });
+            });
+
+            // Configurar modal
+            const modal = document.getElementById('modal-evento');
+            const closeButtons = document.querySelectorAll('.close, .close-modal');
+            
+            closeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            });
+
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Funciones principales
+        async function cargarDatosCliente() {
+            try {
+                const response = await fetch('/api/cliente_info');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('cliente-nombre').textContent = data.cliente.nombre || 'Cliente';
+                }
+            } catch (error) {
+                console.error('Error cargando datos del cliente:', error);
+            }
+        }
+
+        async function cargarServicios() {
+            try {
+                const response = await fetch('/api/servicios');
+                const data = await response.json();
+                
+                if (data.success) {
+                    serviciosDisponibles = data.servicios;
+                    mostrarServiciosDisponibles();
+                }
+            } catch (error) {
+                console.error('Error cargando servicios:', error);
+            }
+        }
+
+        async function cargarArticulos() {
+            try {
+                const response = await fetch('/api/articulos');
+                const data = await response.json();
+                
+                if (data.success) {
+                    articulosDisponibles = data.articulos;
+                    mostrarArticulosDisponibles();
+                }
+            } catch (error) {
+                console.error('Error cargando artículos:', error);
+            }
+        }
+
+        function mostrarServiciosDisponibles() {
+            const container = document.getElementById('servicios-disponibles');
+            if (serviciosDisponibles.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay servicios disponibles.</p>';
+                return;
+            }
+
+            const serviciosHTML = serviciosDisponibles.slice(0, 4).map(servicio => `
+                <div class="servicio-preview">
+                    <div class="nombre">${servicio.nombre_servicio}</div>
+                    <div class="precio">Q${parseFloat(servicio.precio).toFixed(2)}</div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = serviciosHTML;
+        }
+
+        function mostrarArticulosDisponibles() {
+            const container = document.getElementById('articulos-disponibles');
+            if (articulosDisponibles.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay artículos disponibles.</p>';
+                return;
+            }
+
+            const articulosHTML = articulosDisponibles.slice(0, 4).map(articulo => `
+                <div class="servicio-preview">
+                    <div class="nombre">${articulo.nombre_articulo}</div>
+                    <div class="precio">Q${parseFloat(articulo.precio_unitario).toFixed(2)}</div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = articulosHTML;
+        }
+
+        function mostrarFormularioEvento() {
+            document.getElementById('modal-evento').style.display = 'block';
+            serviciosSeleccionados = [];
+            mostrarOpcionesDisponibles();
+            calcularTotal();
+        }
+
+        function mostrarOpcionesDisponibles() {
+            const grid = document.getElementById('servicios-grid');
+            grid.innerHTML = '';
+            
+            // Agregar servicios (sin cantidad, son únicos)
+            serviciosDisponibles.forEach(servicio => {
+                const servicioCard = document.createElement('div');
+                servicioCard.className = 'servicio-card';
+                servicioCard.dataset.tipo = 'servicio';
+                servicioCard.dataset.id = servicio.id_servicio;
+                
+                servicioCard.innerHTML = `
+                    <div class="servicio-nombre">${servicio.nombre_servicio}</div>
+                    <div class="servicio-precio">Q${parseFloat(servicio.precio).toFixed(2)}</div>
+                    <div class="servicio-duracion">Servicio</div>
+                `;
+                
+                servicioCard.addEventListener('click', function() {
+                    toggleItem({
+                        id_articulo: servicio.id_servicio,
+                        nombre: servicio.nombre_servicio,
+                        precio_unitario: parseFloat(servicio.precio),
+                        cantidad: 1,
+                        tipo: 'servicio',
+                        stock_disponible: 999
+                    });
+                    this.classList.toggle('selected');
+                    calcularTotal();
+                });
+                
+                grid.appendChild(servicioCard);
+            });
+
+            // Agregar artículos (con selector de cantidad)
+            articulosDisponibles.forEach(articulo => {
+                const articuloCard = document.createElement('div');
+                articuloCard.className = 'servicio-card';
+                articuloCard.dataset.tipo = 'articulo';
+                articuloCard.dataset.id = articulo.id_articulo;
+                
+                articuloCard.innerHTML = `
+                    <div class="servicio-nombre">${articulo.nombre_articulo}</div>
+                    <div class="servicio-precio">Q${parseFloat(articulo.precio_unitario).toFixed(2)} c/u</div>
+                    <div class="servicio-duracion">Stock: ${articulo.cantidad_total}</div>
+                    <div class="cantidad-selector" style="display: none;">
+                        <label style="font-size: 0.875rem; margin-bottom: 0.5rem; display: block;">Cantidad:</label>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button type="button" class="btn-cantidad" data-action="decrease">-</button>
+                            <input type="number" class="input-cantidad" min="1" max="${articulo.cantidad_total}" value="1" style="width: 60px;">
+                            <button type="button" class="btn-cantidad" data-action="increase">+</button>
+                        </div>
+                        <small class="stock-info">
+                            Máximo disponible: ${articulo.cantidad_total}
+                        </small>
+                    </div>
+                `;
+                
+                // Event listener para seleccionar el artículo
+                articuloCard.addEventListener('click', function(e) {
+                    if (e.target.closest('.cantidad-selector')) return;
+                    
+                    const cantidadSelector = this.querySelector('.cantidad-selector');
+                    const isSelected = this.classList.contains('selected');
+                    
+                    if (!isSelected) {
+                        this.classList.add('selected');
+                        cantidadSelector.style.display = 'block';
+                        
+                        const cantidad = parseInt(this.querySelector('.input-cantidad').value);
+                        toggleItem({
+                            id_articulo: articulo.id_articulo,
+                            nombre: articulo.nombre_articulo,
+                            precio_unitario: parseFloat(articulo.precio_unitario),
+                            cantidad: cantidad,
+                            tipo: 'articulo',
+                            stock_disponible: articulo.cantidad_total
+                        });
+                    } else {
+                        this.classList.remove('selected');
+                        cantidadSelector.style.display = 'none';
+                        
+                        const index = serviciosSeleccionados.findIndex(s => s.id_articulo === articulo.id_articulo);
+                        if (index > -1) {
+                            serviciosSeleccionados.splice(index, 1);
+                        }
+                    }
+                    calcularTotal();
+                });
+                
+                // Event listeners para los botones de cantidad
+                const btnDecrease = articuloCard.querySelector('[data-action="decrease"]');
+                const btnIncrease = articuloCard.querySelector('[data-action="increase"]');
+                const inputCantidad = articuloCard.querySelector('.input-cantidad');
+                
+                btnDecrease.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    let cantidad = parseInt(inputCantidad.value);
+                    if (cantidad > 1) {
+                        cantidad--;
+                        inputCantidad.value = cantidad;
+                        actualizarCantidadItem(articulo.id_articulo, cantidad);
+                    }
+                });
+                
+                btnIncrease.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    let cantidad = parseInt(inputCantidad.value);
+                    if (cantidad < articulo.cantidad_total) {
+                        cantidad++;
+                        inputCantidad.value = cantidad;
+                        actualizarCantidadItem(articulo.id_articulo, cantidad);
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stock insuficiente',
+                            text: `Solo hay ${articulo.cantidad_total} unidades disponibles de ${articulo.nombre_articulo}`,
+                            timer: 3000
+                        });
+                    }
+                });
+                
+                inputCantidad.addEventListener('change', function(e) {
+                    e.stopPropagation();
+                    let cantidad = parseInt(this.value);
+                    
+                    if (cantidad < 1) {
+                        cantidad = 1;
+                        this.value = 1;
+                    } else if (cantidad > articulo.cantidad_total) {
+                        cantidad = articulo.cantidad_total;
+                        this.value = articulo.cantidad_total;
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stock insuficiente',
+                            text: `Solo hay ${articulo.cantidad_total} unidades disponibles de ${articulo.nombre_articulo}`,
+                            timer: 3000
+                        });
+                    }
+                    
+                    actualizarCantidadItem(articulo.id_articulo, cantidad);
+                });
+                
+                grid.appendChild(articuloCard);
+            });
+        }
+
+        function actualizarCantidadItem(id_articulo, nuevaCantidad) {
+            const index = serviciosSeleccionados.findIndex(s => s.id_articulo === id_articulo);
+            if (index > -1) {
+                serviciosSeleccionados[index].cantidad = nuevaCantidad;
+                calcularTotal();
+            }
+        }
+
+        function toggleItem(item) {
+            const index = serviciosSeleccionados.findIndex(s => s.id_articulo === item.id_articulo);
+            
+            if (index > -1) {
+                serviciosSeleccionados[index] = item;
+            } else {
+                serviciosSeleccionados.push(item);
+            }
+        }
+
+        function calcularTotal() {
+            const total = serviciosSeleccionados.reduce((sum, item) => {
+                return sum + (item.precio_unitario * item.cantidad);
+            }, 0);
+            
+            document.getElementById('total-evento').textContent = `Q${total.toFixed(2)}`;
+        }
+
+        async function cargarEventos() {
+            try {
+                const response = await fetch('/api/mis_eventos');
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarEventos(data.eventos);
+                    mostrarProximosEventos(data.eventos);
+                }
+            } catch (error) {
+                console.error('Error cargando eventos:', error);
+            }
+        }
+
+        function mostrarEventos(eventos) {
+            const container = document.getElementById('lista-eventos');
+            
+            if (eventos.length === 0) {
+                container.innerHTML = '<p class="text-muted">No tienes eventos agendados.</p>';
+                return;
+            }
+            
+            const eventosHTML = eventos.map(evento => `
+                <div class="evento-item">
+                    <div class="evento-header">
+                        <strong>Evento #${evento.id_evento}</strong>
+                        <span class="status-badge status-${evento.estado}">${evento.estado}</span>
+                    </div>
+                    <div class="evento-details">
+                        <p><i class="fas fa-calendar"></i> ${evento.fecha_evento}</p>
+                        <p><i class="fas fa-clock"></i> ${evento.hora_inicio} - ${evento.hora_fin}</p>
+                        <p><i class="fas fa-dollar-sign"></i> Q${parseFloat(evento.monto_total).toFixed(2)}</p>
+                        ${evento.detalles.length > 0 ? `
+                        <div style="margin-top: 1rem;">
+                            <strong>Servicios/Artículos:</strong><br>
+                            ${evento.detalles.map(d => `<span style="display: inline-block; margin-right: 1rem; color: var(--text-secondary);">${d.nombre_articulo} (${d.cantidad})</span>`).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="evento-actions">
+                        ${evento.estado === 'reservado' ? `
+                            <button class="btn-sm btn-primary" onclick="procesarPago(${evento.id_evento}, ${evento.monto_total})">
+                                <i class="fas fa-credit-card"></i> Pagar
+                            </button>
+                        ` : ''}
+                        ${evento.estado === 'confirmado' || evento.estado === 'completado' ? `
+                            <button class="btn-sm btn-success" onclick="generarPDF(${evento.id_evento})">
+                                <i class="fas fa-file-pdf"></i> Descargar PDF
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = eventosHTML;
+        }
+
+        function mostrarProximosEventos(eventos) {
+            const container = document.getElementById('proximos-eventos');
+            const proximosEventos = eventos.filter(e => e.estado !== 'cancelado').slice(0, 3);
+            
+            if (proximosEventos.length === 0) {
+                container.innerHTML = '<p class="text-muted">No tienes eventos próximos.</p>';
+                return;
+            }
+            
+            const eventosHTML = proximosEventos.map(evento => `
+                <div class="servicio-preview">
+                    <div class="nombre">Evento #${evento.id_evento}</div>
+                    <div class="precio">Q${parseFloat(evento.monto_total).toFixed(2)}</div>
+                </div>
+                <small style="color: var(--text-secondary); display: block; margin-top: 0.25rem;">
+                    ${evento.fecha_evento} - ${evento.estado}
+                </small>
+            `).join('');
+            
+            container.innerHTML = eventosHTML;
+        }
+
+        function mostrarPerfil() {
+            fetch('/api/cliente_info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const cliente = data.cliente;
+                        document.getElementById('info-perfil').innerHTML = `
+                            <div style="display: grid; gap: 1rem;">
+                                <div class="servicio-preview">
+                                    <div class="nombre">Nombre</div>
+                                    <div class="precio">${cliente.nombre || 'No especificado'}</div>
+                                </div>
+                                <div class="servicio-preview">
+                                    <div class="nombre">Usuario</div>
+                                    <div class="precio">${cliente.username}</div>
+                                </div>
+                                <div class="servicio-preview">
+                                    <div class="nombre">Email</div>
+                                    <div class="precio">${cliente.email}</div>
+                                </div>
+                                <div class="servicio-preview">
+                                    <div class="nombre">Teléfono</div>
+                                    <div class="precio">${cliente.telefono || 'No especificado'}</div>
+                                </div>
+                                <div class="servicio-preview">
+                                    <div class="nombre">Dirección</div>
+                                    <div class="precio">${cliente.direccion || 'No especificada'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando perfil:', error);
+                    document.getElementById('info-perfil').innerHTML = '<p class="text-muted">Error cargando información del perfil.</p>';
+                });
+        }
+
+        async function guardarEvento() {
+            const form = document.getElementById('form-evento');
+            const formData = new FormData(form);
+            
+            const eventoData = {
+                fecha_evento: formData.get('fecha_evento'),
+                hora_inicio: formData.get('hora_inicio'),
+                hora_fin: formData.get('hora_fin'),
+                servicios: serviciosSeleccionados,
+                monto_total: serviciosSeleccionados.reduce((sum, s) => sum + (s.precio_unitario * s.cantidad), 0)
+            };
+            
+            try {
+                const response = await fetch('/api/eventos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(eventoData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Evento Agendado',
+                        text: 'Tu evento ha sido agendado exitosamente'
+                    });
+                    
+                    document.getElementById('modal-evento').style.display = 'none';
+                    cargarEventos();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error al agendar evento'
+                });
+            }
+        }
+
+        async function procesarPago(eventoId, monto) {
+            const { value: metodo } = await Swal.fire({
+                title: 'Procesar Pago',
+                text: `Total a pagar: Q${monto.toFixed(2)}`,
+                input: 'select',
+                inputOptions: {
+                    'efectivo': 'Efectivo',
+                    'tarjeta': 'Tarjeta',
+                    'transferencia': 'Transferencia'
+                },
+                inputPlaceholder: 'Selecciona método de pago',
+                showCancelButton: true,
+                confirmButtonText: 'Procesar Pago',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (metodo) {
+                try {
+                    const response = await fetch('/api/pagos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id_evento: eventoId,
+                            monto: monto,
+                            metodo: metodo
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pago Procesado',
+                            text: 'Tu pago ha sido procesado exitosamente'
+                        });
+                        
+                        cargarEventos();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message || 'Error al procesar pago'
+                    });
+                }
+            }
+        }
+
+        async function generarPDF(eventoId) {
+            try {
+                Swal.fire({
+                    title: 'Generando PDF...',
+                    text: 'Por favor espera',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const response = await fetch(`/api/generar_pdf/${eventoId}`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `evento_${eventoId}_${new Date().toISOString().slice(0,10)}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'PDF Descargado',
+                        text: 'El PDF ha sido descargado exitosamente',
+                        timer: 2000
+                    });
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al generar PDF');
+                }
+                
+            } catch (error) {
+                console.error('Error generando PDF:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Error al generar PDF'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

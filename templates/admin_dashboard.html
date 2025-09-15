@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Calzada - Dashboard Administrador</title>
+    <link rel="icon" type="image/svg+xml" href="static/logo-calzada.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+        :root {
+            --primary-color: #2563EB;
+            --primary-light: #60A5FA;
+            --primary-dark: #1D4ED8;
+            --accent-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --background: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--card-bg);
+            padding: 2rem;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .logo-img {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .user-info {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            padding: 1rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .user-info p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .menu-section {
+            margin-top: 2rem;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-link:hover, .menu-link.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .menu-link i {
+            width: 24px;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+            background: var(--background);
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), transparent);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card .icon.primary { background: var(--primary-color); }
+        .stat-card .icon.success { background: var(--accent-color); }
+        .stat-card .icon.warning { background: var(--warning-color); }
+        .stat-card .icon.danger { background: var(--danger-color); }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tablas */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to right, var(--card-bg), #F8FAFC);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--background);
+        }
+
+        td {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        tbody tr:hover {
+            background: #F8FAFC;
+        }
+
+        /* Botones */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-reservado {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-confirmado {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-completado {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-bloqueado {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Stock levels */
+        .stock-bajo {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+
+        .stock-medio {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+
+        .stock-alto {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Calendario */
+        .calendario {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dia-semana {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .dia {
+            background: var(--card-bg);
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            min-height: 60px;
+        }
+
+        .dia:hover {
+            background: #F8FAFC;
+        }
+
+        .dia.ocupado {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .dia.bloqueado {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .dia.otro-mes {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .eventos-dia {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Secciones */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Chart containers */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Filtros */
+        .filtros {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .filtro-select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        /* Modal simple para stock */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="static/alquifiestas.png" alt="Logo Alquifiestas" class="logo-img">
+            </div>
+
+            <div class="user-info">
+                <h3>Administrador</h3>
+                <p>Panel de Control</p>
+            </div>
+
+            <nav class="menu-section">
+                <a href="#" class="menu-link active" data-section="dashboard">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="menu-link" data-section="eventos">
+                    <i class="fas fa-calendar-alt"></i>
+                    Gestión de Eventos
+                </a>
+                <a href="#" class="menu-link" data-section="calendario">
+                    <i class="fas fa-calendar"></i>
+                    Calendario
+                </a>
+                <a href="#" class="menu-link" data-section="stock">
+                    <i class="fas fa-boxes"></i>
+                    Control de Stock
+                </a>
+                <a href="#" class="menu-link" data-section="clientes">
+                    <i class="fas fa-users"></i>
+                    Gestión de Clientes
+                </a>
+                <a href="#" class="menu-link" data-section="reportes">
+                    <i class="fas fa-chart-line"></i>
+                    Reportes
+                </a>
+                <a href="/logout" class="menu-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Principal -->
+            <div id="seccion-dashboard" class="section active">
+                <div class="header">
+                    <h1>Dashboard Administrativo</h1>
+                </div>
+
+                <!-- Estadísticas principales -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Total Clientes</h3>
+                        <div class="number" id="stat-clientes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon success">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>Eventos del Mes</h3>
+                        <div class="number" id="stat-eventos-mes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon warning">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3>Ingresos Totales</h3>
+                        <div class="number" id="stat-ingresos">Q0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Stock Bajo</h3>
+                        <div class="number" id="stat-stock-bajo">0</div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-chart-line"></i> Eventos por Mes</h3>
+                        <div class="chart-container">
+                            <canvas id="eventosChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-chart-pie"></i> Artículos Más Usados</h3>
+                        <div class="chart-container">
+                            <canvas id="articulosChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Eventos -->
+            <div id="seccion-eventos" class="section">
+                <div class="header">
+                    <h1>Gestión de Eventos</h1>
+                </div>
+
+                <div class="filtros">
+                    <select class="filtro-select" id="filtro-estado">
+                        <option value="">Todos los estados</option>
+                        <option value="reservado">Reservado</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="completado">Completado</option>
+                    </select>
+                    <input type="date" class="filtro-select" id="filtro-fecha">
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Lista de Eventos</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Estado</th>
+                                <th>Total</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-eventos">
+                            <tr>
+                                <td colspan="7">Cargando eventos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div id="seccion-calendario" class="section">
+                <div class="header">
+                    <h1>Calendario de Eventos</h1>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 id="mes-actual">Octubre 2024</h3>
+                        <div>
+                            <button class="btn btn-primary" onclick="cambiarMes(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-primary" onclick="cambiarMes(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendario" id="calendario">
+                        <!-- El calendario se generará dinámicamente -->
+                    </div>
+
+                    <div style="margin-top: 1rem; display: flex; gap: 1rem; font-size: 0.875rem;">
+                        <span><span class="status-badge status-reservado">Reservado</span></span>
+                        <span><span class="status-badge status-confirmado">Confirmado</span></span>
+                        <span><span class="status-badge status-bloqueado">Bloqueado</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control de Stock -->
+            <div id="seccion-stock" class="section">
+                <div class="header">
+                    <h1>Control de Stock</h1>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Inventario de Artículos</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Artículo</th>
+                                <th>Tipo</th>
+                                <th>Stock</th>
+                                <th>Nivel</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-stock">
+                            <tr>
+                                <td colspan="6">Cargando stock...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Gestión de Clientes -->
+            <div id="seccion-clientes" class="section">
+                <div class="header">
+                    <h1>Gestión de Clientes</h1>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Lista de Clientes</h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Eventos</th>
+                                <th>Total Gastado</th>
+                                <th>Registro</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-clientes">
+                            <tr>
+                                <td colspan="6">Cargando clientes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reportes -->
+            <div id="seccion-reportes" class="section">
+                <div class="header">
+                    <h1>Reportes y Analíticas</h1>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3><i class="fas fa-chart-area"></i> Ingresos por Mes</h3>
+                        <div class="chart-container">
+                            <canvas id="ingresosChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-chart-bar"></i> Estados de Eventos</h3>
+                        <div class="chart-container">
+                            <canvas id="estadosChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para actualizar stock -->
+    <div id="modal-stock" class="modal">
+        <div class="modal-content">
+            <h3>Actualizar Stock</h3>
+            <div class="form-group">
+                <label for="stock-articulo">Artículo</label>
+                <input type="text" class="form-control" id="stock-articulo" readonly>
+            </div>
+            <div class="form-group">
+                <label for="stock-cantidad">Nueva Cantidad</label>
+                <input type="number" class="form-control" id="stock-cantidad" min="0">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="cerrarModalStock()">Cancelar</button>
+                <button class="btn btn-success" onclick="actualizarStock()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let fechasOcupadas = {};
+        let eventos = [];
+        let currentStockArticulo = null;
+
+        // Cargar datos iniciales
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarEstadisticas();
+            cargarEventos();
+            cargarFechasOcupadas();
+            cargarStock();
+            cargarClientes();
+            cargarGraficos();
+            generarCalendario();
+
+            // Configurar navegación
+            document.querySelectorAll('.menu-link[data-section]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+                    
+                    // Actualizar clase activa
+                    document.querySelector('.menu-link.active').classList.remove('active');
+                    this.classList.add('active');
+                    
+                    // Mostrar sección
+                    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                    document.getElementById(`seccion-${section}`).classList.add('active');
+                    
+                    // Cargar datos específicos
+                    if (section === 'eventos') cargarEventos();
+                    if (section === 'stock') cargarStock();
+                    if (section === 'clientes') cargarClientes();
+                    if (section === 'calendario') generarCalendario();
+                });
+            });
+
+            // Filtros
+            document.getElementById('filtro-estado').addEventListener('change', filtrarEventos);
+            document.getElementById('filtro-fecha').addEventListener('change', filtrarEventos);
+        });
+
+        // Cargar estadísticas
+        async function cargarEstadisticas() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('stat-clientes').textContent = stats.total_clientes;
+                    document.getElementById('stat-eventos-mes').textContent = stats.eventos_mes;
+                    document.getElementById('stat-ingresos').textContent = `Q${stats.total_ingresos.toFixed(2)}`;
+                    document.getElementById('stat-stock-bajo').textContent = stats.articulos_stock_bajo;
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+
+        // Cargar eventos
+        async function cargarEventos() {
+            try {
+                const response = await fetch('/api/admin/eventos');
+                const data = await response.json();
+                
+                if (data.success) {
+                    eventos = data.eventos;
+                    mostrarEventos(eventos);
+                }
+            } catch (error) {
+                console.error('Error cargando eventos:', error);
+            }
+        }
+
+        function mostrarEventos(eventosLista) {
+            const tbody = document.getElementById('tabla-eventos');
+            
+            if (eventosLista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">No hay eventos</td></tr>';
+                return;
+            }
+
+            const eventosHTML = eventosLista.map(evento => `
+                <tr>
+                    <td>#${evento.id_evento}</td>
+                    <td>${evento.cliente_nombre}</td>
+                    <td>${evento.fecha_evento}</td>
+                    <td>${evento.hora_inicio} - ${evento.hora_fin}</td>
+                    <td><span class="status-badge status-${evento.estado}">${evento.estado}</span></td>
+                    <td>Q${parseFloat(evento.monto_total).toFixed(2)}</td>
+                    <td>
+                        ${evento.estado === 'confirmado' ? `
+                            <button class="btn btn-success" onclick="marcarEmbodegado(${evento.id_evento})">
+                                <i class="fas fa-check"></i> Embodegar
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-primary" onclick="verDetallesEvento(${evento.id_evento})">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            tbody.innerHTML = eventosHTML;
+        }
+
+        function filtrarEventos() {
+            const estadoFiltro = document.getElementById('filtro-estado').value;
+            const fechaFiltro = document.getElementById('filtro-fecha').value;
+            
+            let eventosFiltrados = eventos;
+            
+            if (estadoFiltro) {
+                eventosFiltrados = eventosFiltrados.filter(e => e.estado === estadoFiltro);
+            }
+            
+            if (fechaFiltro) {
+                eventosFiltrados = eventosFiltrados.filter(e => e.fecha_evento === fechaFiltro);
+            }
+            
+            mostrarEventos(eventosFiltrados);
+        }
+
+        // Marcar como embodegado
+        async function marcarEmbodegado(eventoId) {
+            const result = await Swal.fire({
+                title: '¿Marcar como embodegado?',
+                text: 'Esto restituirá el stock de artículos al inventario',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, embodegar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/admin/eventos/${eventoId}/embodeagar`, {
+                        method: 'POST'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        Swal.fire('Embodegado', data.message, 'success');
+                        cargarEventos();
+                        cargarStock();
+                        cargarEstadisticas();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } catch (error) {
+                    Swal.fire('Error', error.message, 'error');
+                }
+            }
+        }
+
+        // Ver detalles del evento
+        function verDetallesEvento(eventoId) {
+            const evento = eventos.find(e => e.id_evento === eventoId);
+            if (!evento) return;
+
+            const detallesHTML = evento.detalles.map(d => 
+                `${d.nombre_articulo} - Cantidad: ${d.cantidad} - Q${parseFloat(d.precio_unitario).toFixed(2)}`
+            ).join('<br>');
+
+            Swal.fire({
+                title: `Evento #${evento.id_evento}`,
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>Cliente:</strong> ${evento.cliente_nombre}</p>
+                        <p><strong>Teléfono:</strong> ${evento.telefono}</p>
+                        <p><strong>Email:</strong> ${evento.email}</p>
+                        <p><strong>Fecha:</strong> ${evento.fecha_evento}</p>
+                        <p><strong>Hora:</strong> ${evento.hora_inicio} - ${evento.hora_fin}</p>
+                        <p><strong>Estado:</strong> ${evento.estado}</p>
+                        <p><strong>Total:</strong> Q${parseFloat(evento.monto_total).toFixed(2)}</p>
+                        <hr>
+                        <p><strong>Artículos/Servicios:</strong></p>
+                        <p>${detallesHTML}</p>
+                    </div>
+                `,
+                width: '600px'
+            });
+        }
+
+        // Cargar fechas ocupadas
+        async function cargarFechasOcupadas() {
+            try {
+                const response = await fetch('/api/admin/fechas-ocupadas');
+                const data = await response.json();
+                
+                if (data.success) {
+                    fechasOcupadas = {};
+                    data.fechas.forEach(f => {
+                        fechasOcupadas[f.fecha] = f.eventos;
+                    });
+                    generarCalendario();
+                }
+            } catch (error) {
+                console.error('Error cargando fechas ocupadas:', error);
+            }
+        }
+
+        // Generar calendario
+        function generarCalendario() {
+            const calendario = document.getElementById('calendario');
+            const mesActual = document.getElementById('mes-actual');
+            
+            const meses = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            
+            mesActual.textContent = `${meses[currentMonth]} ${currentYear}`;
+            
+            // Limpiar calendario
+            calendario.innerHTML = '';
+            
+            // Días de la semana
+            const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            diasSemana.forEach(dia => {
+                const diaDiv = document.createElement('div');
+                diaDiv.className = 'dia-semana';
+                diaDiv.textContent = dia;
+                calendario.appendChild(diaDiv);
+            });
+            
+            // Primer día del mes y días en el mes
+            const primerDia = new Date(currentYear, currentMonth, 1).getDay();
+            const diasEnMes = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            // Días del mes anterior
+            for (let i = 0; i < primerDia; i++) {
+                const diaDiv = document.createElement('div');
+                diaDiv.className = 'dia otro-mes';
+                calendario.appendChild(diaDiv);
+            }
+            
+            // Días del mes actual
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const diaDiv = document.createElement('div');
+                diaDiv.className = 'dia';
+                diaDiv.textContent = dia;
+                
+                const fechaCompleta = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                
+                if (fechasOcupadas[fechaCompleta]) {
+                    diaDiv.classList.add('ocupado');
+                    
+                    const eventosSpan = document.createElement('span');
+                    eventosSpan.className = 'eventos-dia';
+                    eventosSpan.textContent = fechasOcupadas[fechaCompleta];
+                    diaDiv.appendChild(eventosSpan);
+                }
+                
+                diaDiv.addEventListener('click', () => toggleBloqueoFecha(fechaCompleta));
+                calendario.appendChild(diaDiv);
+            }
+        }
+
+        function cambiarMes(direccion) {
+            currentMonth += direccion;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generarCalendario();
+        }
+
+        async function toggleBloqueoFecha(fecha) {
+            const fechaObj = new Date(fecha);
+            const hoy = new Date();
+            
+            if (fechaObj < hoy) {
+                Swal.fire('Error', 'No se puede modificar fechas pasadas', 'error');
+                return;
+            }
+
+            const tienEventos = fechasOcupadas[fecha];
+            const resultado = await Swal.fire({
+                title: tienEventos ? 'Desbloquear fecha' : 'Bloquear fecha',
+                text: tienEventos ? 
+                    `Esta fecha tiene ${tienEventos} evento(s). ¿Desbloquear?` : 
+                    '¿Bloquear esta fecha para nuevos eventos?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: tienEventos ? 'Desbloquear' : 'Bloquear',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (resultado.isConfirmed) {
+                try {
+                    const response = await fetch('/api/admin/bloquear-fecha', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fecha: fecha,
+                            bloquear: !tienEventos
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        Swal.fire('Éxito', data.message, 'success');
+                        cargarFechasOcupadas();
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } catch (error) {
+                    Swal.fire('Error', error.message, 'error');
+                }
+            }
+        }
+
+        // Cargar stock
+        async function cargarStock() {
+            try {
+                const response = await fetch('/api/admin/stock');
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarStock(data.articulos);
+                }
+            } catch (error) {
+                console.error('Error cargando stock:', error);
+            }
+        }
+
+        function mostrarStock(articulos) {
+            const tbody = document.getElementById('tabla-stock');
+            
+            if (articulos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No hay artículos</td></tr>';
+                return;
+            }
+
+            const articulosHTML = articulos.map(articulo => `
+                <tr>
+                    <td>${articulo.nombre_articulo}</td>
+                    <td>${articulo.tipo || 'N/A'}</td>
+                    <td class="stock-${articulo.nivel_stock}">${articulo.cantidad_total}</td>
+                    <td>
+                        <span class="stock-${articulo.nivel_stock}">
+                            ${articulo.nivel_stock.toUpperCase()}
+                        </span>
+                    </td>
+                    <td>Q${parseFloat(articulo.precio_unitario).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="abrirModalStock(${articulo.id_articulo}, '${articulo.nombre_articulo}', ${articulo.cantidad_total})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            tbody.innerHTML = articulosHTML;
+        }
+
+        function abrirModalStock(id, nombre, cantidad) {
+            currentStockArticulo = id;
+            document.getElementById('stock-articulo').value = nombre;
+            document.getElementById('stock-cantidad').value = cantidad;
+            document.getElementById('modal-stock').style.display = 'block';
+        }
+
+        function cerrarModalStock() {
+            document.getElementById('modal-stock').style.display = 'none';
+            currentStockArticulo = null;
+        }
+
+        async function actualizarStock() {
+            if (!currentStockArticulo) return;
+
+            const cantidad = document.getElementById('stock-cantidad').value;
+            
+            try {
+                const response = await fetch(`/api/admin/stock/${currentStockArticulo}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cantidad: parseInt(cantidad) })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    Swal.fire('Éxito', data.message, 'success');
+                    cerrarModalStock();
+                    cargarStock();
+                    cargarEstadisticas();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Cargar clientes
+        async function cargarClientes() {
+            try {
+                const response = await fetch('/api/admin/clientes');
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarClientes(data.clientes);
+                }
+            } catch (error) {
+                console.error('Error cargando clientes:', error);
+            }
+        }
+
+        function mostrarClientes(clientes) {
+            const tbody = document.getElementById('tabla-clientes');
+            
+            if (clientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No hay clientes</td></tr>';
+                return;
+            }
+
+            const clientesHTML = clientes.map(cliente => `
+                <tr>
+                    <td>${cliente.nombre}</td>
+                    <td>${cliente.email}</td>
+                    <td>${cliente.telefono || 'N/A'}</td>
+                    <td>${cliente.total_eventos}</td>
+                    <td>Q${parseFloat(cliente.total_gastado).toFixed(2)}</td>
+                    <td>${new Date(cliente.fecha_registro).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+            
+            tbody.innerHTML = clientesHTML;
+        }
+
+        // Cargar gráficos
+        async function cargarGraficos() {
+            try {
+                const response = await fetch('/api/admin/graficos');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const graficos = data.graficos;
+                    crearGraficoEventos(graficos.eventos_por_mes);
+                    crearGraficoArticulos(graficos.articulos_populares);
+                    crearGraficoIngresos(graficos.ingresos_por_mes);
+                    crearGraficoEstados();
+                }
+            } catch (error) {
+                console.error('Error cargando gráficos:', error);
+            }
+        }
+
+        function crearGraficoEventos(datos) {
+            const ctx = document.getElementById('eventosChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datos.map(d => `${d.mes}/${d.anio}`),
+                    datasets: [{
+                        label: 'Eventos',
+                        data: datos.map(d => d.total),
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function crearGraficoArticulos(datos) {
+            const ctx = document.getElementById('articulosChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: datos.map(d => d.nombre),
+                    datasets: [{
+                        data: datos.map(d => d.cantidad),
+                        backgroundColor: [
+                            '#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function crearGraficoIngresos(datos) {
+            const ctx = document.getElementById('ingresosChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: datos.map(d => `${d.mes}/${d.anio}`),
+                    datasets: [{
+                        label: 'Ingresos (Q)',
+                        data: datos.map(d => d.ingresos),
+                        backgroundColor: '#10B981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function crearGraficoEstados() {
+            const ctx = document.getElementById('estadosChart').getContext('2d');
+            
+            // Contar eventos por estado
+            const estadosCount = {};
+            eventos.forEach(e => {
+                estadosCount[e.estado] = (estadosCount[e.estado] || 0) + 1;
+            });
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(estadosCount),
+                    datasets: [{
+                        data: Object.values(estadosCount),
+                        backgroundColor: ['#F59E0B', '#10B981', '#2563EB', '#EF4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('modal-stock');
+            if (e.target === modal) {
+                cerrarModalStock();
+            }
+        });
+    </script>
+</body>
+</html>
