@@ -1,0 +1,39 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-label="Logo L">
+  <defs>
+    <!-- Gradiente para la letra -->
+    <linearGradient id="gradL" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#FFA726"></stop>
+      <stop offset="1" stop-color="#FB8C00"></stop>
+    </linearGradient>
+
+    <!-- Sombra de la letra -->
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.25"></feDropShadow>
+    </filter>
+
+    <!-- Sombra interior muy sutil para el marco -->
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"></feGaussianBlur>
+      <feOffset dx="0" dy="2" result="offset"></feOffset>
+      <feComposite in="offset" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inset"></feComposite>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0 0.0  0 0 0 0.25 0" result="shadow"></feColorMatrix>
+      <feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>
+    </filter>
+  </defs>
+
+  <!-- Marco redondeado (borde exterior) -->
+  <rect x="6" y="6" width="188" height="188" rx="28" ry="28" fill="#FFFFFF" stroke="#F4CBA8" stroke-width="6"></rect>
+
+  <!-- Fondo interior ligeramente elevado (opcional efecto) -->
+  <rect x="14" y="14" width="172" height="172" rx="22" ry="22" fill="#FFFFFF" filter="url(#innerShadow)"></rect>
+
+  <!-- Letra L -->
+  <!-- ajusta x,y,font-size si quieres variar el tamaño -->
+  <text x="48" y="138" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="700" font-style="italic" fill="url(#gradL)" filter="url(#dropShadow)" paint-order="fill">
+    L
+  </text>
+
+  <!-- Pequeño detalle: punto/serif decorativo en la esquina superior derecha -->
+  <circle cx="162" cy="38" r="4.5" fill="#FB8C00" opacity="0.95"></circle>
+</svg>
